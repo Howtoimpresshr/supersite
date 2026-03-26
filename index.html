@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная картинка — 11 знаков вопроса по кругу</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+        
+        .image-map { 
+            position: relative; 
+            display: inline-block; 
+            border-radius: 12px;
+            overflow: visible;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .image-map img { 
+            display: block; 
+            max-width: 100%; 
+            height: auto; 
+        }
+        
+        /* Контейнер для интерактивного элемента */
+        .interactive-wrapper {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Стили для интерактивных изображений */
+        .interactive-image {
+            width: 65px;
+            height: 65px;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.5);
+            display: block;
+        }
+        
+        .interactive-wrapper:hover .interactive-image {
+            transform: scale(1.15);
+            border-color: #ffaa00;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+        
+        /* Стили для текста при наведении */
+        .hover-text {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(12px);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 16px;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.4;
+            z-index: 200;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.2s ease;
+            font-family: inherit;
+            min-width: 280px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transform: translateY(10px);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        .interactive-wrapper:hover .hover-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* Адаптация для мобильных */
+        @media (max-width: 768px) {
+            .interactive-image {
+                width: 50px;
+                height: 50px;
+            }
+            .hover-text {
+                min-width: 220px;
+                padding: 15px 20px;
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hover-text {
+                white-space: normal;
+                min-width: 180px;
+                max-width: 250px;
+            }
+        }
+        
+        /* Позиционирование текста в зависимости от места */
+        .hover-text.top {
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            margin-bottom: 15px;
+        }
+        
+        .interactive-wrapper:hover .hover-text.top {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .hover-text.bottom {
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            margin-top: 15px;
+        }
+        
+        .interactive-wrapper:hover .hover-text.bottom {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .hover-text.left {
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%) translateX(-10px);
+            margin-right: 15px;
+        }
+        
+        .interactive-wrapper:hover .hover-text.left {
+            transform: translateY(-50%) translateX(0);
+        }
+        
+        .hover-text.right {
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+            margin-left: 15px;
+        }
+        
+        .interactive-wrapper:hover .hover-text.right {
+            transform: translateY(-50%) translateX(0);
+        }
+        
+        /* Стили для вертикального разделения текста */
+        .text-block {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .text-part {
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 480px) {
+            .text-part {
+                white-space: normal;
+            }
+            .text-block {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .separator-vertical {
+                width: 50px;
+                height: 2px;
+            }
+        }
+        
+        .separator-vertical {
+            width: 2px;
+            height: 50px;
+            background: white;
+            flex-shrink: 0;
+        }
+        
+        .blue-text {
+            color: #3b82f6;
+            font-weight: 700;
+        }
+        
+        .red-text {
+            color: #ef4444;
+            font-weight: 700;
+        }
+        
+        .wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        .info { 
+            text-align: center; 
+            margin-top: 20px; 
+            color: #aaa; 
+            font-size: 14px; 
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Декоративная подсказка о круге */
+        .circle-note {
+            text-align: center;
+            margin-top: 15px;
+            color: #ffaa55;
+            font-size: 12px;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="image-map">
+        <!-- Фоновая картинка -->
+        <img src="izba.jpg" alt="Фоновая картинка" id="backgroundImage">
+    </div>
+</div>
+
+<script>
+    const bgImage = document.getElementById('backgroundImage');
+    const imageMap = document.querySelector('.image-map');
+    
+    // ========== 11 ИЗОБРАЖЕНИЙ (ЗНАКОВ ВОПРОСА) ==========
+    // Все точки будут расположены по кругу
+    // Координаты рассчитываются динамически в зависимости от размеров картинки
+    // Радиус круга — 32% от меньшей стороны изображения
+    // Центр круга — центр изображения (50%, 50%)
+    
+    const imagesData = [
+        { 
+            src: "https://img.freepik.com/premium-vector/hand-drawn-wooden-hut-with-trees-cartoon-vector-illustration-clipart-white-background_191095-40768.jpg",
+            blue: "избА", 
+            red: "хАта"
+        },
+        { 
+            src: "https://main-cdn.sbermegamarket.ru/big2/hlr-system/191/702/381/312/419/46/100063859069b4.jpg",
+            blue: "лучИна", 
+            red: "дрАночка"
+        },
+        { 
+            src: "https://media.ovkuse.ru/images/recipes/ca6d1a7a-4a70-4610-9f75-0fdca9b2dd8e/ca6d1a7a-4a70-4610-9f75-0fdca9b2dd8e_840_840.webp",
+            blue: "шАньги", 
+            red: "пЫшки"
+        },
+        { 
+            src: "https://media.istockphoto.com/id/655786684/ru/%D1%84%D0%BE%D1%82%D0%BE/%D0%B4%D0%B2%D1%83%D1%81%D0%BF%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F-%D0%BA%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C-%D0%BA%D0%BE%D1%80%D0%BE%D0%BB%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE-%D1%80%D0%B0%D0%B7%D0%BC%D0%B5%D1%80%D0%B0.jpg?s=612x612&w=0&k=20&c=40qGZxxkiwSYAvYa0CuMUwZyGf0tyNTDCfkg9GQtBQo=",
+            blue: "полАти", 
+            red: "лежАнка"
+        },
+        { 
+            src: "https://cs5.livemaster.ru/storage/e6/31/44e50e08c6bdb44f3aec64fb05jh--russkij-stil-porty.jpg",
+            blue: "гачИ", 
+            red: "портЫ"
+        },
+        { 
+            src: "https://avatars.mds.yandex.net/i?id=1b1d70ceb1fffab32293cfa52346ae1736907162-5334779-images-thumbs&n=13",
+            blue: "бадьЯ", 
+            red: "цыбАрки"
+        },
+        { 
+            src: "https://cache3.youla.io/files/images/720_720_out/5e/8b/5e8b608166fb07c21f147282.jpg",
+            blue: "крошнИ", 
+            red: "постИлки"
+        },
+        { 
+            src: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Angle_Symbol.svg/1188px-Angle_Symbol.svg.png",
+            blue: "кут", 
+            red: "покУт"
+        },
+        { 
+            src: "https://cdn1.ozone.ru/s3/multimedia-1-5/7189730285.jpg",
+            blue: "лАпоть", 
+            red: "чувЯки"
+        },
+        { 
+            src: "https://avatars.mds.yandex.net/get-mpic/12284361/2a0000019427462f9ed37ebdec7d80352811/orig",
+            blue: "вЕрша", 
+            red: "брЕдень"
+        },
+        { 
+            src: "https://img.freepik.com/premium-photo/magnificent-wedding-tablecloths-isolated-white-background_787273-65601.jpg?semt=ais_hybrid&w=740&q=80",
+            blue: "брАнина", 
+            red: "настОльник"
+        }
+    ];
+    
+    // Функция для определения направления текста по углу (для лучшего позиционирования подсказки)
+    function getTextPositionByAngle(angleDeg) {
+        // angleDeg: 0° = вверх, 90° = вправо, 180° = вниз, 270° = влево
+        // Нормализуем угол от 0 до 360
+        let angle = angleDeg % 360;
+        if (angle < 0) angle += 360;
+        
+        // Верхняя полусфера (от 315° до 45°) — подсказка снизу
+        if (angle >= 315 || angle < 45) return 'bottom';
+        // Нижняя полусфера (от 135° до 225°) — подсказка сверху
+        if (angle >= 135 && angle < 225) return 'top';
+        // Правая сторона (от 45° до 135°) — подсказка слева
+        if (angle >= 45 && angle < 135) return 'right';
+        // Левая сторона (от 225° до 315°) — подсказка справа
+        return 'left';
+    }
+    
+    // Создаём все интерактивные элементы, расположенные по кругу
+    function createInteractiveElements() {
+        const imgRect = bgImage.getBoundingClientRect();
+        const width = imgRect.width;
+        const height = imgRect.height;
+        
+        if (width === 0 || height === 0) {
+            setTimeout(createInteractiveElements, 100);
+            return;
+        }
+        
+        // Центр изображения
+        const centerX = width / 2;
+        const centerY = height / 2;
+        
+        // Радиус круга: 35% от минимальной стороны, чтобы круг был хорошо виден
+        // и не упирался в края (с учётом размера иконок)
+        const minSide = Math.min(width, height);
+        let radius = minSide * 0.32;
+        
+        // Корректируем радиус, чтобы точки не выходили за границы (с учётом отступа)
+        const maxRadiusX = centerX - 45;
+        const maxRadiusY = centerY - 45;
+        radius = Math.min(radius, maxRadiusX, maxRadiusY);
+        
+        // Количество точек
+        const pointsCount = imagesData.length; // = 11
+        
+        // Создаём элементы
+        imagesData.forEach((data, index) => {
+            // Угол для текущей точки (равномерное распределение по кругу)
+            // Начинаем с верхней точки (угол -90° или 270°, чтобы первая точка была сверху)
+            // Можно начать с 0° (справа), но для эстетики сделаем так, чтобы одна точка была строго сверху
+            // Для 11 точек повернём так, чтобы круг выглядел симметрично
+            const angleStep = 360 / pointsCount;
+            // Смещаем на -90°, чтобы первая точка была наверху (12 часов)
+            let angleDeg = (index * angleStep) - 90;
+            
+            // Переводим в радианы
+            const angleRad = angleDeg * Math.PI / 180;
+            
+            // Вычисляем позицию точки (центр иконки)
+            const pointX = centerX + radius * Math.cos(angleRad);
+            const pointY = centerY + radius * Math.sin(angleRad);
+            
+            // Определяем направление подсказки по углу
+            const textPos = getTextPositionByAngle(angleDeg);
+            
+            // Создаём контейнер-обёртку
+            const wrapper = document.createElement('div');
+            wrapper.className = 'interactive-wrapper';
+            // Используем translate(-50%, -50%) для точного центрирования
+            wrapper.style.left = `${pointX}px`;
+            wrapper.style.top = `${pointY}px`;
+            wrapper.style.width = '65px';
+            wrapper.style.height = '65px';
+            
+            // Создаём подсказку
+            const textDiv = document.createElement('div');
+            textDiv.className = `hover-text ${textPos}`;
+            textDiv.innerHTML = `
+                <div class="text-block">
+                    <div class="text-part"><span class="blue-text">${data.blue}</span></div>
+                    <div class="separator-vertical"></div>
+                    <div class="text-part"><span class="red-text">${data.red}</span></div>
+                </div>
+            `;
+            
+            // Создаём изображение
+            const img = document.createElement('img');
+            img.className = 'interactive-image';
+            img.src = data.src;
+            img.alt = data.blue;
+            
+            // Собираем всё вместе
+            wrapper.appendChild(img);
+            wrapper.appendChild(textDiv);
+            imageMap.appendChild(wrapper);
+        });
+        
+        // Добавляем небольшой декоративный индикатор в консоль (для отладки)
+        console.log(`Создано ${pointsCount} точек по кругу. Радиус: ${radius.toFixed(1)}px, центр: (${centerX.toFixed(1)}, ${centerY.toFixed(1)})`);
+    }
+    
+    // Запускаем создание после загрузки страницы
+    window.addEventListener('load', () => {
+        if (bgImage.complete) {
+            createInteractiveElements();
+        } else {
+            bgImage.addEventListener('load', createInteractiveElements);
+        }
+    });
+    
+    // При изменении размера окна пересоздаём элементы
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const elements = document.querySelectorAll('.interactive-wrapper');
+            elements.forEach(el => el.remove());
+            createInteractiveElements();
+        }, 200);
+    });
+</script>
+</body>
+</html>
