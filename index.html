@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Интерактивная картинка — 12 знаков вопроса по кругу</title>
+    <title>Интерактивная картинка — 13 знаков вопроса по кругу</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -202,7 +202,7 @@
     const bgImage = document.getElementById('backgroundImage');
     const imageMap = document.querySelector('.image-map');
     
-    // ========== 12 ИЗОБРАЖЕНИЙ (добавлена 12-я картинка) ==========
+    // ========== 13 ИЗОБРАЖЕНИЙ (добавлена 13-я картинка) ==========
     const imagesData = [
         { 
             src: "https://img.freepik.com/premium-vector/hand-drawn-wooden-hut-with-trees-cartoon-vector-illustration-clipart-white-background_191095-40768.jpg",
@@ -260,10 +260,15 @@
             red: "настОльник"
         },
         { 
-            // 12-я картинка (новая)
-            src: "https://static.vecteezy.com/system/resources/previews/055/515/506/non_2x/yellow-thumbs-up-emoji-on-white-background-vector.jpg",
+            src: "https://avatars.mds.yandex.net/i?id=b4081ecf7a80acb02171d5fbf812dd164ddb7b95-6358986-images-thumbs&n=13",
             blue: "гОже", 
             red: "добрО"
+        },
+        { 
+            // 13-я картинка (новая)
+            src: "https://resant.ru/wp-content/uploads/ac559a30dbbdcc423c2a03a55c8435c3.jpg",
+            blue: "копАнец", 
+            red: "кринИца"
         }
     ];
     
@@ -291,7 +296,7 @@
         const maxRadiusY = centerY - 45;
         radius = Math.min(radius, maxRadiusX, maxRadiusY);
         
-        const pointsCount = imagesData.length; // теперь 12
+        const pointsCount = imagesData.length; // теперь 13
         
         // Создаём контейнер для текста в центре
         const centerTextContainer = document.createElement('div');
@@ -379,6 +384,5 @@
 </script>
 </body>
 </html>
-</script>
 </body>
 </html>
